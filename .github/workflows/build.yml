@@ -1,0 +1,67 @@
+name: Build WaveMorph (Windows & macOS)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, macos-14]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Ninja & CMake
+        uses: seanpackham/setup-ninja@v1
+        with:
+          version: 1.11.1
+
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cmake -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cmake --build build --config Release --parallel
+
+      - name: Configure CMake (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cmake --build build --config Release
+
+      - name: Upload Windows Artifacts
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: WaveMorph-Windows-VST3-and-Standalone
+          path: |
+            build/WaveMorph_artefacts/Release/VST3/WaveMorph.vst3
+            build/WaveMorph_artefacts/Release/Standalone/WaveMorph.exe
+
+      - name: Upload macOS Artifacts
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: WaveMorph-macOS-VST3-AU-App
+          path: |
+            build/WaveMorph_artefacts/Release/VST3/WaveMorph.vst3
+            build/WaveMorph_artefacts/Release/AU/WaveMorph.component
+            build/WaveMorph_artefacts/Release/Standalone/WaveMorph.app

@@ -1,0 +1,36 @@
+# Build and binary artifacts
+build/
+bin/
+WaveMorph.app
+*.vst3/
+*.component/
+*.app/
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+*.lib
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# IDE and Editor
+.vscode/
+.idea/
+*.xcodeproj/
+CMakeSettings.json
+compile_commands.json
+
+# Audio test files
+*.wav
+*.mp3
+*.aif
+*.aiff
+*.flac
